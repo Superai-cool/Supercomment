@@ -84,7 +84,7 @@ REVIEW:
 \"\"\"{review}\"\"\"
 
 Rules:
-- Only generate a short reply (20–50 words).
+- Only generate a short reply (25–60 words).
 - No emojis.
 - Don't use generic intros like "Dear Customer" unless it fits.
 - Reflect tone and content of review.
@@ -125,7 +125,7 @@ if "reply" not in st.session_state:
 
 # 🏷️ Title
 st.markdown("<h1>💬 Supercomment</h1>", unsafe_allow_html=True)
-st.markdown("Reply to Google Reviews like a pro — in under 50 words.")
+st.markdown("Reply to Google Reviews like a pro — in under 60 words.")
 
 # ✍️ Input Fields
 st.session_state.review = st.text_area("📝 Paste Google Review", value=st.session_state.review, height=140)
