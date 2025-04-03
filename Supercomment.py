@@ -3,13 +3,13 @@ import openai
 import os
 import random
 
-# Load OpenAI API Key
+# Set your OpenAI key
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 
-# Streamlit page config
-st.set_page_config(page_title="Review Reply GPT", layout="centered")
+# Page config
+st.set_page_config(page_title="Supercomment", layout="centered")
 
-# Custom styling
+# --- Styling ---
 st.markdown("""
     <style>
         body {
@@ -17,13 +17,13 @@ st.markdown("""
             font-family: 'Segoe UI', sans-serif;
         }
         .block-container {
-            max-width: 750px;
+            max-width: 700px;
             margin: auto;
             padding-top: 2rem;
         }
         h1 {
             text-align: center;
-            color: #2c3e50;
+            color: #1a202c;
             font-size: 2.4rem;
         }
         .stTextArea textarea, .stTextInput input {
@@ -32,12 +32,18 @@ st.markdown("""
             border-radius: 10px;
         }
         .stButton>button {
-            background-color: #1a73e8;
-            color: white;
             font-size: 1rem;
             padding: 0.6rem 1.2rem;
             border-radius: 10px;
             border: none;
+        }
+        .generate-btn {
+            background-color: #1a73e8 !important;
+            color: white !important;
+        }
+        .clear-btn {
+            background-color: #e63946 !important;
+            color: white !important;
         }
         .response-box {
             background-color: #ffffff;
@@ -49,43 +55,43 @@ st.markdown("""
             line-height: 1.6;
             white-space: pre-wrap;
         }
-        .small-text {
-            font-size: 0.9rem;
-            color: #888;
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .response-box { font-size: 1rem; }
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Title & Description
-st.title("💬 Review Reply GPT")
-st.markdown("Generate **20–50 word** replies to Google Reviews with just one click.")
-st.markdown("Now with: sentiment detection, regenerate, and copy-to-clipboard ✨")
+# --- Title ---
+st.title("💬 Supercomment")
+st.markdown("Reply to Google Reviews like a pro — in under 50 words.")
 
-# App state
+# --- Session State ---
 if "reply" not in st.session_state:
     st.session_state.reply = ""
 if "prompt" not in st.session_state:
     st.session_state.prompt = ""
+if "copied" not in st.session_state:
+    st.session_state.copied = False
 
-# Inputs
-review = st.text_area("📝 Paste Google Review", height=150, placeholder="E.g., Great coffee and service, but the place was a bit crowded.")
+# --- Inputs ---
+review = st.text_area("📝 Paste Google Review", height=140, placeholder="E.g., Great service but the wait was a bit long.")
 tone = st.selectbox("🎯 Choose Reply Tone", ["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"])
 
-# Basic Sentiment Analysis
-def guess_sentiment(text):
+# --- Sentiment Detection (simple keywords) ---
+def detect_sentiment(text):
     text = text.lower()
-    if any(word in text for word in ["bad", "worst", "rude", "disappointed", "wait", "problem", "issue"]):
+    if any(word in text for word in ["bad", "worst", "rude", "disappointed", "issue", "wait", "problem"]):
         return "Negative"
     elif any(word in text for word in ["okay", "average", "decent", "not bad", "could be better"]):
         return "Neutral"
-    else:
-        return "Positive"
+    return "Positive"
 
-sentiment = guess_sentiment(review) if review.strip() else None
+sentiment = detect_sentiment(review) if review.strip() else None
 if sentiment:
     st.markdown(f"🧠 **Detected Sentiment:** `{sentiment}`")
 
-# Prompt builder
+# --- Prompt Builder ---
 def build_prompt(review, tone):
     return f"""
 You are a specialized GPT assistant designed solely for generating short, professional replies to Google Reviews.
@@ -105,10 +111,10 @@ Rules:
   "This GPT is designed only to generate short replies to Google Reviews. Please paste a review and select a tone to receive a reply."
 """
 
-# GPT Call
+# --- GPT Call ---
 def generate_reply():
+    prompt = build_prompt(review, tone)
     try:
-        prompt = build_prompt(review, tone)
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
@@ -117,42 +123,57 @@ def generate_reply():
         )
         st.session_state.reply = response['choices'][0]['message']['content'].strip()
         st.session_state.prompt = prompt
+        st.session_state.copied = False
     except Exception as e:
         st.error(f"Error: {e}")
         st.session_state.reply = ""
 
-# Buttons
-col1, col2 = st.columns([1, 1])
+# --- Clear App State ---
+def clear_state():
+    st.session_state.reply = ""
+    st.session_state.prompt = ""
+    st.session_state.copied = False
+
+# --- Buttons ---
+col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
-    if st.button("✨ Generate Reply"):
-        if not review.strip():
-            st.warning("Please paste a review.")
-        else:
+    if st.button("✨ Generate Reply", key="generate", help="Generate reply from GPT", type="primary"):
+        if review.strip():
             generate_reply()
+        else:
+            st.warning("Please paste a review first.")
+
 with col2:
-    if st.button("🔄 Regenerate"):
+    if st.button("🔄 Regenerate", key="regen", help="Get another version"):
         if st.session_state.prompt:
             generate_reply()
         else:
-            st.warning("Please generate a reply first.")
+            st.warning("Generate a reply first before regenerating.")
 
-# Show GPT Output
+with col3:
+    if st.button("🧹 Clear", key="clear", help="Clear everything", type="secondary"):
+        clear_state()
+
+# --- Output Section ---
 if st.session_state.reply:
     st.markdown("### ✅ Suggested Reply")
     st.markdown(f"<div class='response-box'>{st.session_state.reply}</div>", unsafe_allow_html=True)
 
-    # Copy to clipboard button
+    # --- Copy to Clipboard JS with dynamic change ---
+    copy_label = "📋 Copy Reply" if not st.session_state.copied else "✅ Copied!"
     copy_script = f"""
     <script>
     function copyToClipboard(text) {{
         navigator.clipboard.writeText(text).then(function() {{
-            alert("Reply copied to clipboard!");
+            const btn = document.getElementById("copy-btn");
+            btn.innerText = "✅ Copied!";
         }});
     }}
     </script>
-    <button onclick="copyToClipboard(`{st.session_state.reply}`)"
+    <button id="copy-btn" onclick="copyToClipboard(`{st.session_state.reply}`)"
             style="margin-top: 10px; padding: 8px 16px; font-size: 16px;
             border-radius: 8px; background-color: #1a73e8;
-            color: white; border: none;">📋 Copy Reply</button>
+            color: white; border: none;">{copy_label}</button>
     """
     st.markdown(copy_script, unsafe_allow_html=True)
+    st.session_state.copied = True
