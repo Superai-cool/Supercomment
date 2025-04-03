@@ -137,7 +137,7 @@ if "reply" not in st.session_state:
 
 # 🏷️ Title
 st.markdown("<h1>💬 Supercomment</h1>", unsafe_allow_html=True)
-st.markdown("Reply to Google Reviews like a pro — in under 50 words.")
+st.markdown("Comment Like a Superhuman.")
 
 # 📝 Input area
 st.session_state.review = st.text_area("📝 Paste Google Review", value=st.session_state.review, height=140)
