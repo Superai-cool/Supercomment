@@ -9,7 +9,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 # Streamlit config
 st.set_page_config(page_title="Supercomment", layout="centered")
 
-# --- CSS for styling ---
+# --- CSS Styling ---
 st.markdown("""
     <style>
         body {
@@ -36,10 +36,6 @@ st.markdown("""
             padding: 0.6rem 1.2rem;
             border-radius: 10px;
             border: none;
-        }
-        .stButton>button:focus {
-            outline: none;
-            box-shadow: none;
         }
         .generate-btn {
             background-color: #ef4444 !important;
@@ -72,9 +68,6 @@ st.markdown("""
             color: white;
             border: none;
         }
-        .copy-btn:hover {
-            background-color: #059669;
-        }
         .sentiment {
             font-weight: bold;
             color: #10b981;
@@ -90,7 +83,7 @@ st.markdown("""
 st.title("💬 Supercomment")
 st.markdown("Reply to Google Reviews like a pro — in under 50 words.")
 
-# --- Session State ---
+# --- Session State Setup ---
 if "reply" not in st.session_state:
     st.session_state.reply = ""
 if "copied" not in st.session_state:
@@ -100,7 +93,7 @@ if "review" not in st.session_state:
 if "tone" not in st.session_state:
     st.session_state.tone = "Professional"
 
-# --- Sentiment Detector ---
+# --- Sentiment Detection ---
 def detect_sentiment(text):
     text = text.lower()
     if any(word in text for word in ["bad", "worst", "rude", "disappointed", "issue", "wait", "problem"]):
@@ -109,7 +102,7 @@ def detect_sentiment(text):
         return "Neutral"
     return "Positive"
 
-# --- GPT Prompt Builder ---
+# --- Prompt Builder ---
 def build_prompt(review, tone):
     return f"""
 You are a specialized GPT assistant designed solely for generating short, professional replies to Google Reviews.
@@ -129,7 +122,7 @@ Rules:
   "This GPT is designed only to generate short replies to Google Reviews. Please paste a review and select a tone to receive a reply."
 """
 
-# --- GPT Generation ---
+# --- Generate GPT Reply ---
 def generate_reply():
     prompt = build_prompt(st.session_state.review, st.session_state.tone)
     try:
@@ -145,12 +138,12 @@ def generate_reply():
         st.error(f"Error: {e}")
         st.session_state.reply = ""
 
-# --- UI Elements ---
+# --- Input UI ---
 st.session_state.review = st.text_area("📝 Paste Google Review", value=st.session_state.review, height=140)
 
 st.session_state.tone = st.selectbox("🎯 Choose Reply Tone", ["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"], index=["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"].index(st.session_state.tone))
 
-# Show sentiment if review present
+# Sentiment Display
 if st.session_state.review.strip():
     sentiment = detect_sentiment(st.session_state.review)
     st.markdown(f"🔍 **Detected Sentiment:** <span class='sentiment'>{sentiment}</span>", unsafe_allow_html=True)
@@ -158,17 +151,19 @@ if st.session_state.review.strip():
 # Buttons
 col1, col2, col3 = st.columns([1, 1, 1])
 with col1:
-    if st.button("✨ Generate Reply", type="primary"):
+    if st.button("✨ Generate Reply"):
         if st.session_state.review.strip():
             generate_reply()
         else:
             st.warning("Please enter a review.")
+
 with col2:
     if st.button("🔄 Regenerate"):
         if st.session_state.reply:
             generate_reply()
         else:
             st.warning("Generate a reply first.")
+
 with col3:
     if st.button("🧹 Clear"):
         st.session_state.reply = ""
@@ -176,14 +171,15 @@ with col3:
         st.session_state.tone = "Professional"
         st.session_state.copied = False
 
-# --- Show reply and copy functionality ---
+# Show reply
 if st.session_state.reply:
     st.markdown("### ✅ Suggested Reply")
     st.markdown(f"<div class='response-box'>{st.session_state.reply}</div>", unsafe_allow_html=True)
 
-    copy_label = "✅ Copied!" if st.session_state.copied else "📋 Copy Reply"
-
-    if st.button(copy_label, key="copy_reply_btn"):
-        st.session_state.copied = True
-        st.code(st.session_state.reply, language='')
-
+    copy_col = st.columns([1])[0]
+    if not st.session_state.copied:
+        if copy_col.button("📋 Copy Reply"):
+            st.session_state.copied = True
+            st.write("✅ Copied!")
+    else:
+        st.markdown("✅ Copied!")
