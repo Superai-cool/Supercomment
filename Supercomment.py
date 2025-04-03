@@ -6,10 +6,10 @@ import random
 # OpenAI API Key
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 
-# Streamlit app settings
+# Streamlit config
 st.set_page_config(page_title="Supercomment", layout="centered")
 
-# 🌟 Custom CSS for responsive and aesthetic UI
+# 🌟 Custom CSS for styling and mobile-friendliness
 st.markdown("""
     <style>
         body {
@@ -77,7 +77,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 🧠 Sentiment detection
+# 🧠 Sentiment Detection
 def detect_sentiment(text):
     text = text.lower()
     if any(word in text for word in ["bad", "worst", "rude", "disappointed", "issue", "wait", "problem"]):
@@ -86,7 +86,7 @@ def detect_sentiment(text):
         return "Neutral"
     return "Positive"
 
-# ✨ Prompt builder
+# ✨ GPT Prompt Builder
 def build_prompt(review, tone):
     return f"""
 You are a specialized GPT assistant designed solely for generating short, professional replies to Google Reviews.
@@ -106,7 +106,7 @@ Rules:
   "This GPT is designed only to generate short replies to Google Reviews. Please paste a review and select a tone to receive a reply."
 """
 
-# 🔁 GPT call
+# 🔁 GPT Call
 def generate_reply():
     prompt = build_prompt(st.session_state.review, st.session_state.tone)
     try:
@@ -121,13 +121,14 @@ def generate_reply():
         st.error(f"Error: {e}")
         st.session_state.reply = ""
 
-# 🧼 Clear state
-def clear_all():
-    st.session_state.review = ""
-    st.session_state.tone = "Professional"
-    st.session_state.reply = ""
+# 🧼 Clear App State & Rerun
+def clear_app():
+    for key in ["review", "tone", "reply"]:
+        if key in st.session_state:
+            del st.session_state[key]
+    st.experimental_rerun()
 
-# 🎯 Session state init
+# 🎯 Session Defaults
 if "review" not in st.session_state:
     st.session_state.review = ""
 if "tone" not in st.session_state:
@@ -135,40 +136,40 @@ if "tone" not in st.session_state:
 if "reply" not in st.session_state:
     st.session_state.reply = ""
 
-# 🏷️ Title
+# 🏷️ App Title
 st.markdown("<h1>💬 Supercomment</h1>", unsafe_allow_html=True)
-st.markdown("Comment Like a Superhuman.")
+st.markdown("Reply to Google Reviews like a pro — in under 50 words.")
 
-# 📝 Input area
+# 📝 Inputs
 st.session_state.review = st.text_area("📝 Paste Google Review", value=st.session_state.review, height=140)
 st.session_state.tone = st.selectbox("🎯 Choose Reply Tone", ["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"], index=["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"].index(st.session_state.tone))
 
-# 📊 Sentiment display
+# 📊 Sentiment
 if st.session_state.review.strip():
     sentiment = detect_sentiment(st.session_state.review)
     st.markdown(f"🔍 **Detected Sentiment:** <span class='sentiment'>{sentiment}</span>", unsafe_allow_html=True)
 
-# 🚀 Button row
+# 🚀 Buttons (flex-row, mobile-friendly)
 st.markdown('<div class="btn-row">', unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 with col1:
-    if st.button("✨ Generate Reply", key="generate"):
+    if st.button("✨ Generate Reply"):
         if st.session_state.review.strip():
             generate_reply()
         else:
-            st.warning("Please paste a review first.")
+            st.warning("Please paste a review.")
 with col2:
-    if st.button("🔄 Regenerate", key="regenerate"):
+    if st.button("🔄 Regenerate"):
         if st.session_state.reply:
             generate_reply()
         else:
-            st.warning("Please generate a reply first.")
+            st.warning("Generate a reply first.")
 with col3:
-    if st.button("🧹 Clear", key="clear"):
-        clear_all()
+    if st.button("🧹 Clear"):
+        clear_app()
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ✅ Display reply
+# ✅ Show GPT reply
 if st.session_state.reply:
     st.markdown("### ✅ Suggested Reply")
     st.markdown(f"<div class='response-box'>{st.session_state.reply}</div>", unsafe_allow_html=True)
