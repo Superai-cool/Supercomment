@@ -1,16 +1,22 @@
 import streamlit as st
 import openai
 import os
-from langdetect import detect
 import random
 
-# Load API key
+# Try to import langdetect, fallback if not available
+try:
+    from langdetect import detect
+    lang_detect_available = True
+except ImportError:
+    lang_detect_available = False
+
+# OpenAI API Key
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 
 # Page config
 st.set_page_config(page_title="Review Reply GPT", layout="centered")
 
-# Custom CSS
+# Modern CSS for styling
 st.markdown("""
     <style>
         body {
@@ -57,43 +63,42 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Title and Instructions
+# Title
 st.title("💬 Review Reply GPT")
-st.markdown("Craft concise, 20–50 word replies to Google Reviews — professionally and fast.")
-st.markdown("Supports **auto-detected sentiment** and **multi-language inputs**.")
 
-# Session state for reply storage
+st.markdown("Craft short, human-like replies to Google Reviews (20–50 words only).")
+
+# Session state for response
 if "reply" not in st.session_state:
     st.session_state.reply = ""
 if "prompt" not in st.session_state:
     st.session_state.prompt = ""
 
 # Inputs
-review = st.text_area("📝 Paste Google Review", height=150, placeholder="E.g., Staff were kind, but the wait time was too long.")
+review = st.text_area("📝 Paste Google Review", height=150, placeholder="E.g., Amazing coffee and kind staff!")
 tone = st.selectbox("🎯 Choose Reply Tone", ["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"])
 
-# Detect language
-detected_lang = detect(review) if review.strip() else None
-if detected_lang and detected_lang != "en":
-    st.markdown(f"🌐 Detected language: **{detected_lang.upper()}** — reply will be generated in English unless translated.")
-    st.markdown("<span class='small-text'>You can mention in the review that the reply should also be in the original language.</span>", unsafe_allow_html=True)
+# Optional: language detection
+if review.strip() and lang_detect_available:
+    detected_lang = detect(review)
+    if detected_lang != "en":
+        st.markdown(f"🌐 Detected Language: **{detected_lang.upper()}** (reply will be in English unless specified otherwise)")
+        st.markdown("<span class='small-text'>Mention in your review if you'd like the reply translated.</span>", unsafe_allow_html=True)
 
-# Sentiment (basic, based on keywords)
+# Simple sentiment logic
 def guess_sentiment(text):
     text = text.lower()
-    if any(word in text for word in ["bad", "worst", "rude", "disappointed", "long wait", "issue", "problem", "not happy"]):
+    if any(x in text for x in ["bad", "worst", "disappointed", "rude", "problem"]):
         return "Negative"
-    elif any(word in text for word in ["okay", "average", "decent", "not bad", "could be better"]):
+    elif any(x in text for x in ["okay", "decent", "average"]):
         return "Neutral"
-    else:
-        return "Positive"
+    return "Positive"
 
-sentiment = guess_sentiment(review) if review else None
-
+sentiment = guess_sentiment(review) if review.strip() else None
 if sentiment:
     st.markdown(f"🧠 **Detected Sentiment:** `{sentiment}`")
 
-# GPT Prompt Builder
+# Prompt builder
 def build_prompt(review, tone):
     return f"""
 You are a specialized GPT assistant designed solely for generating short, professional replies to Google Reviews.
@@ -126,7 +131,7 @@ def generate_reply():
         st.session_state.reply = response['choices'][0]['message']['content'].strip()
         st.session_state.prompt = prompt
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Error generating reply: {e}")
         st.session_state.reply = ""
 
 # Buttons
@@ -134,30 +139,3 @@ col1, col2 = st.columns([1, 1])
 with col1:
     if st.button("✨ Generate Reply"):
         if not review.strip():
-            st.warning("Please enter a review first.")
-        else:
-            generate_reply()
-with col2:
-    if st.button("🔄 Regenerate"):
-        if st.session_state.prompt:
-            generate_reply()
-        else:
-            st.warning("Please generate an initial reply first.")
-
-# Output
-if st.session_state.reply:
-    st.markdown("### ✅ Suggested Reply")
-    st.markdown(f"<div class='response-box'>{st.session_state.reply}</div>", unsafe_allow_html=True)
-    
-    # Copy to clipboard using JS injection
-    copy_code = f"""
-    <script>
-    function copyToClipboard(text) {{
-        navigator.clipboard.writeText(text).then(function() {{
-            alert("Reply copied to clipboard!");
-        }});
-    }}
-    </script>
-    <button onclick="copyToClipboard(`{st.session_state.reply}`)" style="margin-top: 10px; padding: 8px 16px; font-size: 16px; border-radius: 8px; background-color: #1a73e8; color: white; border: none;">📋 Copy Reply</button>
-    """
-    st.markdown(copy_code, unsafe_allow_html=True)
