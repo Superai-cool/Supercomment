@@ -3,13 +3,13 @@ import openai
 import os
 import random
 
-# OpenAI API Key
+# Set OpenAI API Key
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 
-# Streamlit config
+# Configure Streamlit app
 st.set_page_config(page_title="Supercomment", layout="centered")
 
-# 🌟 Custom CSS for responsive and elegant UI
+# ✅ CSS for modern, responsive UI
 st.markdown("""
     <style>
         body {
@@ -73,7 +73,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ✨ Prompt Builder
+# 🧠 Prompt Builder
 def build_prompt(review, tone):
     return f"""
 You are a specialized GPT assistant designed solely for generating short, professional replies to Google Reviews.
@@ -93,7 +93,7 @@ Rules:
   "This GPT is designed only to generate short replies to Google Reviews. Please paste a review and select a tone to receive a reply."
 """
 
-# 🔁 GPT Call
+# 🚀 GPT Generator
 def generate_reply():
     prompt = build_prompt(st.session_state.review, st.session_state.tone)
     try:
@@ -108,14 +108,14 @@ def generate_reply():
         st.error(f"Error: {e}")
         st.session_state.reply = ""
 
-# 🧼 Clear App State & Rerun
+# 🧼 Clear App State and Rerun (NEW API)
 def clear_app():
     for key in ["review", "tone", "reply"]:
         if key in st.session_state:
             del st.session_state[key]
-    st.experimental_rerun()
+    st.rerun()
 
-# 🎯 Session Defaults
+# 🔄 Session Defaults
 if "review" not in st.session_state:
     st.session_state.review = ""
 if "tone" not in st.session_state:
@@ -123,15 +123,15 @@ if "tone" not in st.session_state:
 if "reply" not in st.session_state:
     st.session_state.reply = ""
 
-# 🏷️ App Title
+# 🏷️ Title
 st.markdown("<h1>💬 Supercomment</h1>", unsafe_allow_html=True)
 st.markdown("Reply to Google Reviews like a pro — in under 50 words.")
 
-# 📝 Inputs
+# ✍️ Input Fields
 st.session_state.review = st.text_area("📝 Paste Google Review", value=st.session_state.review, height=140)
 st.session_state.tone = st.selectbox("🎯 Choose Reply Tone", ["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"], index=["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"].index(st.session_state.tone))
 
-# 🚀 Button Row
+# 🚦 Action Buttons
 st.markdown('<div class="btn-row">', unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -151,7 +151,7 @@ with col3:
         clear_app()
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ✅ Show Reply
+# ✅ Show GPT Reply
 if st.session_state.reply:
     st.markdown("### ✅ Suggested Reply")
     st.markdown(f"<div class='response-box'>{st.session_state.reply}</div>", unsafe_allow_html=True)
