@@ -9,7 +9,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 # Streamlit config
 st.set_page_config(page_title="Supercomment", layout="centered")
 
-# 🌟 Custom CSS for styling and mobile-friendliness
+# 🌟 Custom CSS for responsive and elegant UI
 st.markdown("""
     <style>
         body {
@@ -65,10 +65,6 @@ st.markdown("""
         .clear-btn {
             background-color: #ef4444;
         }
-        .sentiment {
-            font-weight: bold;
-            color: #10b981;
-        }
         @media (max-width: 500px) {
             .btn-row {
                 flex-direction: column;
@@ -77,16 +73,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 🧠 Sentiment Detection
-def detect_sentiment(text):
-    text = text.lower()
-    if any(word in text for word in ["bad", "worst", "rude", "disappointed", "issue", "wait", "problem"]):
-        return "Negative"
-    elif any(word in text for word in ["okay", "average", "decent", "not bad", "could be better"]):
-        return "Neutral"
-    return "Positive"
-
-# ✨ GPT Prompt Builder
+# ✨ Prompt Builder
 def build_prompt(review, tone):
     return f"""
 You are a specialized GPT assistant designed solely for generating short, professional replies to Google Reviews.
@@ -100,7 +87,7 @@ Rules:
 - Only generate a short reply (20–50 words).
 - No emojis.
 - Don't use generic intros like "Dear Customer" unless it fits.
-- Reflect tone and sentiment of review.
+- Reflect tone and content of review.
 - Stay authentic and specific.
 - If review is not relevant, reply:
   "This GPT is designed only to generate short replies to Google Reviews. Please paste a review and select a tone to receive a reply."
@@ -111,7 +98,7 @@ def generate_reply():
     prompt = build_prompt(st.session_state.review, st.session_state.tone)
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4o",
+            model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
             temperature=random.uniform(0.6, 0.8),
             max_tokens=150
@@ -144,12 +131,7 @@ st.markdown("Reply to Google Reviews like a pro — in under 50 words.")
 st.session_state.review = st.text_area("📝 Paste Google Review", value=st.session_state.review, height=140)
 st.session_state.tone = st.selectbox("🎯 Choose Reply Tone", ["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"], index=["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"].index(st.session_state.tone))
 
-# 📊 Sentiment
-if st.session_state.review.strip():
-    sentiment = detect_sentiment(st.session_state.review)
-    st.markdown(f"🔍 **Detected Sentiment:** <span class='sentiment'>{sentiment}</span>", unsafe_allow_html=True)
-
-# 🚀 Buttons (flex-row, mobile-friendly)
+# 🚀 Button Row
 st.markdown('<div class="btn-row">', unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -169,7 +151,7 @@ with col3:
         clear_app()
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ✅ Show GPT reply
+# ✅ Show Reply
 if st.session_state.reply:
     st.markdown("### ✅ Suggested Reply")
     st.markdown(f"<div class='response-box'>{st.session_state.reply}</div>", unsafe_allow_html=True)
