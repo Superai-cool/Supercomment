@@ -9,7 +9,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 # Streamlit App Config with 💬 in Title
 st.set_page_config(page_title="💬 EasyReply", layout="centered")
 
-# ✅ Poppins Font + Responsive UI
+# ✅ Global Styling: Poppins Font + UI Tweaks
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
@@ -38,9 +38,14 @@ st.markdown("""
             line-height: 1.6;
             margin-bottom: 1.5rem;
         }
-        .stTextArea textarea, .stSelectbox div {
-            font-size: 1rem !important;
+        .stTextArea textarea,
+        .stSelectbox div,
+        .stButton button,
+        .stMarkdown,
+        .stAlert,
+        .stTextInput input {
             font-family: 'Poppins', sans-serif !important;
+            font-size: 1rem !important;
         }
         .response-box {
             background-color: #ffffff;
