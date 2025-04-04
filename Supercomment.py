@@ -9,12 +9,16 @@ openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 # Streamlit App Config
 st.set_page_config(page_title="EasyReply", layout="centered")
 
-# ✅ CSS for Beautiful, Mobile-Responsive UI
+# ✅ Poppins Font + Clean UI CSS
 st.markdown("""
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+        html, body, [class*="css"] {
+            font-family: 'Poppins', sans-serif !important;
+        }
         body {
             background-color: #f9fafb;
-            font-family: 'Segoe UI', sans-serif;
         }
         .block-container {
             max-width: 700px;
@@ -36,6 +40,7 @@ st.markdown("""
         }
         .stTextArea textarea, .stSelectbox div {
             font-size: 1rem !important;
+            font-family: 'Poppins', sans-serif !important;
         }
         .response-box {
             background-color: #ffffff;
@@ -46,6 +51,7 @@ st.markdown("""
             line-height: 1.6;
             white-space: pre-wrap;
             margin-top: 1rem;
+            font-family: 'Poppins', sans-serif !important;
         }
         .btn-row {
             display: flex;
@@ -62,6 +68,7 @@ st.markdown("""
             border-radius: 8px;
             border: none;
             color: white;
+            font-family: 'Poppins', sans-serif !important;
         }
         .generate-btn {
             background-color: #1d4ed8;
@@ -133,7 +140,7 @@ if "tone" not in st.session_state:
 if "reply" not in st.session_state:
     st.session_state.reply = ""
 
-# 💬 Title and Centered Subtitle
+# 💬 Title and Subtitle (Centered)
 st.markdown("<h1>💬 EasyReply</h1>", unsafe_allow_html=True)
 st.markdown("""
 <div class='subtitle'>
@@ -142,15 +149,18 @@ Turn every review into a relationship — easily and professionally.
 </div>
 """, unsafe_allow_html=True)
 
-# ✍️ Input Area
-st.session_state.review = st.text_area("📝 Paste Google Review", value=st.session_state.review, height=140)
+# ✍️ Review Input
+st.markdown("<div style='text-align: center; font-weight: 500; font-size: 1.1rem;'>📝 Paste Google Review</div>", unsafe_allow_html=True)
+st.session_state.review = st.text_area(label="", value=st.session_state.review, height=140, label_visibility="collapsed")
+
+# 🎯 Tone Select
 st.session_state.tone = st.selectbox(
     "🎯 Choose Reply Tone",
     ["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"],
     index=["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"].index(st.session_state.tone)
 )
 
-# 🚦 Action Buttons
+# 🚦 Buttons: Generate / Regenerate / Clear
 st.markdown('<div class="btn-row">', unsafe_allow_html=True)
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -170,7 +180,7 @@ with col3:
         clear_app()
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ✅ Show the Reply
+# ✅ Display Reply
 if st.session_state.reply:
     st.markdown("### ✅ Suggested Reply")
     st.markdown(f"<div class='response-box'>{st.session_state.reply}</div>", unsafe_allow_html=True)
