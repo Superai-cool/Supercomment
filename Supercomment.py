@@ -6,8 +6,8 @@ import random
 # Set OpenAI API Key
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 
-# Streamlit App Config
-st.set_page_config(page_title="EasyReply", layout="centered")
+# Streamlit App Config with 💬 in Title
+st.set_page_config(page_title="💬 EasyReply", layout="centered")
 
 # ✅ Poppins Font + Responsive UI
 st.markdown("""
@@ -149,7 +149,7 @@ Turn every review into a relationship — easily and professionally.
 </div>
 """, unsafe_allow_html=True)
 
-# 📝 Paste Google Review (default alignment restored)
+# 📝 Paste Google Review
 st.session_state.review = st.text_area("📝 Paste Google Review", value=st.session_state.review, height=140)
 
 # 🎯 Choose Tone
