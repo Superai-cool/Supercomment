@@ -6,10 +6,10 @@ import random
 # Set OpenAI API Key
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 
-# Streamlit App Config with 💬 in Title
+# Streamlit App Config
 st.set_page_config(page_title="💬 EasyReply", layout="centered")
 
-# ✅ Global Styling: Poppins Font + UI Tweaks
+# ✅ Global Styling: Poppins Font + UI Fixes
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
@@ -38,6 +38,14 @@ st.markdown("""
             line-height: 1.6;
             margin-bottom: 1.5rem;
         }
+
+        /* 🎯 Make form labels same size and font */
+        label, .stTextArea label, .stSelectbox label {
+            font-size: 1rem !important;
+            font-family: 'Poppins', sans-serif !important;
+            font-weight: 500;
+        }
+
         .stTextArea textarea,
         .stSelectbox div,
         .stButton button,
@@ -47,6 +55,7 @@ st.markdown("""
             font-family: 'Poppins', sans-serif !important;
             font-size: 1rem !important;
         }
+
         .response-box {
             background-color: #ffffff;
             padding: 1.5rem;
@@ -58,6 +67,7 @@ st.markdown("""
             margin-top: 1rem;
             font-family: 'Poppins', sans-serif !important;
         }
+
         .btn-row {
             display: flex;
             justify-content: space-between;
@@ -84,6 +94,7 @@ st.markdown("""
         .clear-btn {
             background-color: #ef4444;
         }
+
         @media (max-width: 500px) {
             .btn-row {
                 flex-direction: column;
@@ -145,7 +156,7 @@ if "tone" not in st.session_state:
 if "reply" not in st.session_state:
     st.session_state.reply = ""
 
-# 💬 Title and Subtitle (centered only)
+# 💬 Title and Subtitle
 st.markdown("<h1>💬 EasyReply</h1>", unsafe_allow_html=True)
 st.markdown("""
 <div class='subtitle'>
