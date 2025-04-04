@@ -7,7 +7,7 @@ import random
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 
 # Configure Streamlit app
-st.set_page_config(page_title="Easyreply", layout="centered")
+st.set_page_config(page_title="EasyReply", layout="centered")
 
 # ✅ CSS for modern, responsive UI
 st.markdown("""
@@ -108,12 +108,12 @@ def generate_reply():
         st.error(f"Error: {e}")
         st.session_state.reply = ""
 
-# 🧼 Clear App State and Rerun (NEW API)
+# 🧼 Clear App State and Rerun
 def clear_app():
     for key in ["review", "tone", "reply"]:
         if key in st.session_state:
             del st.session_state[key]
-    st.rerun()
+    st.rerun()  # ✅ Correct API
 
 # 🔄 Session Defaults
 if "review" not in st.session_state:
@@ -125,12 +125,16 @@ if "reply" not in st.session_state:
 
 # 🏷️ Title
 st.markdown("<h1>💬 EasyReply</h1>", unsafe_allow_html=True)
-st.markdown("EasyReply uses AI to craft thoughtful, personalized responses to Google reviews.
-Turn every review into a relationship — easily and professionally.")
+st.markdown("""EasyReply uses AI to craft thoughtful, personalized responses to Google reviews.  
+Turn every review into a relationship — easily and professionally.""")
 
 # ✍️ Input Fields
 st.session_state.review = st.text_area("📝 Paste Google Review", value=st.session_state.review, height=140)
-st.session_state.tone = st.selectbox("🎯 Choose Reply Tone", ["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"], index=["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"].index(st.session_state.tone))
+st.session_state.tone = st.selectbox(
+    "🎯 Choose Reply Tone",
+    ["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"],
+    index=["Professional", "Friendly", "Empathetic", "Apologetic", "Appreciative"].index(st.session_state.tone)
+)
 
 # 🚦 Action Buttons
 st.markdown('<div class="btn-row">', unsafe_allow_html=True)
