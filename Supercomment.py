@@ -7,7 +7,7 @@ import random
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 
 # Configure Streamlit app
-st.set_page_config(page_title="Supercomment", layout="centered")
+st.set_page_config(page_title="Easyreply", layout="centered")
 
 # ✅ CSS for modern, responsive UI
 st.markdown("""
