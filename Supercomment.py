@@ -115,7 +115,7 @@ def generate_reply():
     prompt = build_prompt(st.session_state.review, st.session_state.tone)
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=random.uniform(0.6, 0.8),
             max_tokens=150
