@@ -9,6 +9,15 @@ openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 # Streamlit App Config
 st.set_page_config(page_title="💬 EasyReply", layout="centered")
 
+# ✅ Add Open Graph Meta Tags for Sharing (Preview Text)
+st.markdown("""
+    <head>
+        <meta property="og:title" content="EasyReply - Your AI Assistant for Google Reviews" />
+        <meta property="og:description" content="Generate quick, professional responses to Google Reviews effortlessly with EasyReply." />
+        <meta property="og:image" content="https://github.com/Superai-cool/Supercomment/blob/17ed2f28487e60c4f2155a3d81e9ad5e89c107d5/Easyreply.png" />
+    </head>
+""", unsafe_allow_html=True)
+
 # ✅ Global Styling: Poppins Font + UI Fixes + Footer
 st.markdown("""
     <style>
