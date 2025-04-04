@@ -14,7 +14,7 @@ st.markdown("""
     <head>
         <meta property="og:title" content="EasyReply - Your AI Assistant for Google Reviews" />
         <meta property="og:description" content="Generate quick, professional responses to Google Reviews effortlessly with EasyReply." />
-        <meta property="og:image" content="https://github.com/Superai-cool/Supercomment/blob/17ed2f28487e60c4f2155a3d81e9ad5e89c107d5/Easyreply.png" />
+        <meta property="og:image" content="https://raw.githubusercontent.com/Superai-cool/Supercomment/17ed2f28487e60c4f2155a3d81e9ad5e89c107d5/Easyreply.png" />
     </head>
 """, unsafe_allow_html=True)
 
