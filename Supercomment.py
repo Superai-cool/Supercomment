@@ -6,10 +6,10 @@ import random
 # Set OpenAI API Key
 openai.api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
 
-# Configure Streamlit app
+# Streamlit App Config
 st.set_page_config(page_title="EasyReply", layout="centered")
 
-# ✅ CSS for modern, responsive UI
+# ✅ CSS for Beautiful, Mobile-Responsive UI
 st.markdown("""
     <style>
         body {
@@ -25,7 +25,14 @@ st.markdown("""
             text-align: center;
             color: #111827;
             font-size: 2.5rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #4b5563;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
         }
         .stTextArea textarea, .stSelectbox div {
             font-size: 1rem !important;
@@ -69,6 +76,9 @@ st.markdown("""
             .btn-row {
                 flex-direction: column;
             }
+            .btn-row button {
+                margin-bottom: 0.5rem;
+            }
         }
     </style>
 """, unsafe_allow_html=True)
@@ -93,7 +103,7 @@ Rules:
   "This GPT is designed only to generate short replies to Google Reviews. Please paste a review and select a tone to receive a reply."
 """
 
-# 🚀 GPT Generator
+# 🚀 Generate Reply
 def generate_reply():
     prompt = build_prompt(st.session_state.review, st.session_state.tone)
     try:
@@ -108,12 +118,12 @@ def generate_reply():
         st.error(f"Error: {e}")
         st.session_state.reply = ""
 
-# 🧼 Clear App State and Rerun
+# 🧼 Clear App and Rerun
 def clear_app():
     for key in ["review", "tone", "reply"]:
         if key in st.session_state:
             del st.session_state[key]
-    st.rerun()  # ✅ Correct API
+    st.rerun()
 
 # 🔄 Session Defaults
 if "review" not in st.session_state:
@@ -123,12 +133,16 @@ if "tone" not in st.session_state:
 if "reply" not in st.session_state:
     st.session_state.reply = ""
 
-# 🏷️ Title
+# 💬 Title and Centered Subtitle
 st.markdown("<h1>💬 EasyReply</h1>", unsafe_allow_html=True)
-st.markdown("""EasyReply uses AI to craft thoughtful, personalized responses to Google reviews.  
-Turn every review into a relationship — easily and professionally.""")
+st.markdown("""
+<div class='subtitle'>
+EasyReply uses AI to craft thoughtful, personalized responses to Google reviews.<br>
+Turn every review into a relationship — easily and professionally.
+</div>
+""", unsafe_allow_html=True)
 
-# ✍️ Input Fields
+# ✍️ Input Area
 st.session_state.review = st.text_area("📝 Paste Google Review", value=st.session_state.review, height=140)
 st.session_state.tone = st.selectbox(
     "🎯 Choose Reply Tone",
@@ -156,7 +170,7 @@ with col3:
         clear_app()
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ✅ Show GPT Reply
+# ✅ Show the Reply
 if st.session_state.reply:
     st.markdown("### ✅ Suggested Reply")
     st.markdown(f"<div class='response-box'>{st.session_state.reply}</div>", unsafe_allow_html=True)
